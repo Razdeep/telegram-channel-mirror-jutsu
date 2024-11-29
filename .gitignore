@@ -1,0 +1,8 @@
+config.py
+.venv
+*.session
+downloads
+__pycache__
+*.mp4
+output.txt
+message_structure.txt
