@@ -116,7 +116,7 @@ def put_download_entry_in_db(message_id: int, new_filename: str, message: str):
     cursor = conn.cursor()
     try:
         cursor.execute('''
-        INSERT INTO messages("id","new_filename","download_status","upload_status","content","download_timestamp","upload_timestamp") 
+        INSERT INTO messages("message_id","new_filename","download_status","upload_status","content","download_timestamp","upload_timestamp") 
                     VALUES (?,?,?,?,?,?,?);
         ''', (int(message_id),new_filename,'downloading','not started', str(message),'',''))
         conn.commit()
