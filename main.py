@@ -16,7 +16,7 @@ def init_db():
     # Create a table to store messages if it doesn't exist
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS messages (
-        id INTEGER PRIMARY KEY,
+        message_id INTEGER PRIMARY KEY,
         new_filename TEXT UNIQUE,
         download_status TEXT,
         upload_status TEXT,
@@ -61,15 +61,30 @@ async def download_videos():
             
             # with open(f'{DOWNLOAD_FOLDER}/{new_filename}', 'wb') as fp:
             #     fp.write(video)
-    
+
+async def upload_videos():
+    for message_id, filename in get_pending_videos_to_upload():
+        await upload_video(filename)
+        update_upload_status(message_id, 'uploaded')
+
+def update_upload_status(message_id: str, status_text: str):
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    UPDATE messages set upload_status=? WHERE message_id=?
+    """, (status_text, message_id))
+
+    conn.commit()
+
 def get_pending_videos_to_upload():
     cursor = conn.cursor()
 
     cursor.execute("""
-    SELECT new_filename from messages
+    SELECT message_id, new_filename from messages
+                   where not upload_status = "uploaded"
     """)
 
-    res = [item[0] for item in cursor.fetchall()]
+    res = [item for item in cursor.fetchall()]
 
     return res
 
@@ -114,4 +129,5 @@ if __name__ == "__main__":
     # init_db()
     # asyncio.run(download_videos())
     # get_pending_videos_to_upload()
-    asyncio.run(upload_video('92626.mp4'))
+    # asyncio.run(upload_video('92626.mp4'))
+    asyncio.run(upload_videos())
