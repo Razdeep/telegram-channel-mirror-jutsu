@@ -42,7 +42,7 @@ def generate_new_filename(message_text, message_id):
 
 async def download_videos():
     async with TelegramClient('session_name', api_id, api_hash) as client:
-        async for message in client.iter_messages(channel_id_source, limit=5, reverse=True):
+        async for message in client.iter_messages(channel_id_source, limit=100, reverse=True):
             if not message.video:
                 print(f'skipping message id {message.id}, because it is not video')
                 continue
@@ -57,10 +57,10 @@ async def download_videos():
 
             print(f"Downloading video Message ID: {message.id}, video size: {message.video.size // (1024*1024)} MB approx")
 
-            # video = await client.download_media(message.video, file=bytes)
+            video = await client.download_media(message.video, file=bytes)
             
-            # with open(f'{DOWNLOAD_FOLDER}/{new_filename}', 'wb') as fp:
-            #     fp.write(video)
+            with open(f'{DOWNLOAD_FOLDER}/{new_filename}', 'wb') as fp:
+                fp.write(video)
 
 async def upload_videos():
     for message_id, filename in get_pending_videos_to_upload():
@@ -126,8 +126,6 @@ def put_download_entry_in_db(message_id: int, new_filename: str, message: str):
     return True
 
 if __name__ == "__main__":
-    # init_db()
-    # asyncio.run(download_videos())
-    # get_pending_videos_to_upload()
-    # asyncio.run(upload_video('92626.mp4'))
-    asyncio.run(upload_videos())
+    init_db()
+    asyncio.run(download_videos())
+    # asyncio.run(upload_videos())
