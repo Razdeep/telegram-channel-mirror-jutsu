@@ -1,13 +1,11 @@
 from telethon import TelegramClient
 import re
-from config import api_id, api_hash, channel_id_source, channel_id_destination
+from config import api_id, api_hash, channel_id_source
 import sqlite3
-import asyncio
 from pathlib import Path
 import logging
 from repository import conn
 import constants
-import upload_service
 
 
 def check_filename_already_exists_in_local(filename):

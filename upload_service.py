@@ -1,11 +1,7 @@
 import constants
 from telethon import TelegramClient
-import re
-from config import api_id, api_hash, channel_id_source, channel_id_destination
-import sqlite3
-import asyncio
+from config import api_id, api_hash, channel_id_destination
 from pathlib import Path
-import logging
 from repository import conn
 
 

@@ -6,3 +6,4 @@ __pycache__
 *.mp4
 output.txt
 message_structure.txt
+messages.db
