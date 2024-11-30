@@ -120,7 +120,9 @@ def put_download_entry_in_db(message_id: int, new_filename: str, message: str):
                     VALUES (?,?,?,?,?,?,?);
         ''', (int(message_id),new_filename,'downloading','not started', str(message),'',''))
         conn.commit()
-    except sqlite3.IntegrityError as ex:
+    except sqlite3.IntegrityError:
+        return False
+    except Exception as ex:
         logging.exception(ex)
         return False
     return True
