@@ -24,10 +24,17 @@ async def upload_video(filename):
         print(f"Video uploaded successfully. Message ID: {message.id}")
 
 
-async def upload_videos():
+async def upload_videos(cleanup=True):
     for message_id, filename in get_pending_videos_to_upload():
         await upload_video(filename)
         update_upload_status(message_id, 'uploaded')
+        if cleanup:
+            delete_video(filename)
+
+def delete_video(filename: str):
+    file_path = Path(f'{constants.DOWNLOAD_FOLDER}/{filename}')
+    if file_path.exists():
+        file_path.unlink()
 
 def update_upload_status(message_id: str, status_text: str):
     cursor = conn.cursor()

@@ -29,12 +29,14 @@ async def download_videos():
             
             new_filename = generate_new_filename(message.message, message.id)
 
-            should_download = put_download_entry_in_db(int(message.id), new_filename, str(message.message))
+            should_download = check_should_download(int(message.id))
 
             if not should_download:
                 print(f'skipping message id {message.id}, because it was already downloaded before')
                 continue
-
+            
+            put_download_entry_in_db(int(message.id), new_filename, str(message.message))
+            
             print(f"Downloading video Message ID: {message.id}, video size: {message.video.size // (1024*1024)} MB approx")
 
             video = await client.download_media(message.video, file=bytes)
@@ -42,12 +44,38 @@ async def download_videos():
             with open(f'{constants.DOWNLOAD_FOLDER}/{new_filename}', 'wb') as fp:
                 fp.write(video)
 
+            update_download_status(message.id, 'downloaded')
+
+
+def update_download_status(message_id: str, status_text: str):
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    UPDATE messages set download_status=? WHERE message_id=?
+    """, (status_text, message_id))
+
+    conn.commit()
 
 def get_current_timestamp():
     from datetime import datetime
     current_datetime = datetime.now()
     datetime_str = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
     return str(datetime_str)
+
+def check_should_download(message_id: int):
+    cursor = conn.cursor()
+    try:
+        cursor.execute('''
+        select message_id,download_status from messages where message_id=?
+        ''', (message_id,))
+        res = [item for item in cursor.fetchall()]
+        if len(res) == 0:
+            return True
+        if res[0][0] == 'downloading':
+            return True
+    except Exception as ex:
+        logging.exception(ex)
+    return False
 
 def put_download_entry_in_db(message_id: int, new_filename: str, message: str):
     cursor = conn.cursor()
