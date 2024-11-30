@@ -10,7 +10,7 @@ async def upload_video(filename):
     # Ensure the video file exists
     if not Path(filepath).exists():
         print(f"File not found: {filepath}")
-        return
+        return False
     
     async with TelegramClient('session_name', api_id, api_hash) as client:
         print(f"Uploading video: {filepath}")
@@ -23,11 +23,14 @@ async def upload_video(filename):
         )
         print(f"Video uploaded successfully. Message ID: {message.id}")
 
+    return True
+
 
 async def upload_videos(cleanup=True):
     for message_id, filename in get_pending_videos_to_upload():
-        await upload_video(filename)
-        update_upload_status(message_id, 'uploaded')
+        upload_successful = await upload_video(filename)
+        if upload_successful:
+            update_upload_status(message_id, 'uploaded')
         if cleanup:
             delete_video(filename)
 

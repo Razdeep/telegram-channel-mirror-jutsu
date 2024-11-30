@@ -32,7 +32,7 @@ async def download_videos():
             should_download = check_should_download(int(message.id))
 
             if not should_download:
-                print(f'skipping message id {message.id}, because it was already downloaded before')
+                print(f'skipping message id {message.id}, because {new_filename} was already downloaded before')
                 continue
             
             put_download_entry_in_db(int(message.id), new_filename, str(message.message))
