@@ -1,11 +1,12 @@
 from telethon import TelegramClient
 import re
-from config import api_id, api_hash, channel_username
+from config import api_id, api_hash, channel_id_source, channel_id_destination
 import sqlite3
 import asyncio
 from pathlib import Path
+import logging
 
-download_folder = 'downloads'
+DOWNLOAD_FOLDER = 'downloads'
 
 conn = sqlite3.connect("messages.db")
 
@@ -16,7 +17,7 @@ def init_db():
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS messages (
         id INTEGER PRIMARY KEY,
-        new_filename TEXT,
+        new_filename TEXT UNIQUE,
         download_status TEXT,
         upload_status TEXT,
         content TEXT,
@@ -41,33 +42,74 @@ def generate_new_filename(message_text, message_id):
 
 async def download_videos():
     async with TelegramClient('session_name', api_id, api_hash) as client:
-        async for message in client.iter_messages(channel_username, limit=5, reverse=True):
+        async for message in client.iter_messages(channel_id_source, limit=5, reverse=True):
             if not message.video:
                 print(f'skipping message id {message.id}, because it is not video')
                 continue
-            print(f"Downloading video Message ID: {message.id}, video size: {message.video.size // (1024*1024)} MB approx")
-            # video = await client.download_media(message.video, file=bytes)
+            
             new_filename = generate_new_filename(message.message, message.id)
 
-            put_download_entry_in_db(int(message.id), new_filename, str(message.message))
+            should_download = put_download_entry_in_db(int(message.id), new_filename, str(message.message))
+
+            if not should_download:
+                print(f'skipping message id {message.id}, because it was already downloaded before')
+                continue
+
+            print(f"Downloading video Message ID: {message.id}, video size: {message.video.size // (1024*1024)} MB approx")
+
+            # video = await client.download_media(message.video, file=bytes)
             
-            # with open(f'{download_folder}/{new_filename}', 'wb') as fp:
+            # with open(f'{DOWNLOAD_FOLDER}/{new_filename}', 'wb') as fp:
             #     fp.write(video)
+    
+def get_pending_videos_to_upload():
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT new_filename from messages
+    """)
+
+    res = [item[0] for item in cursor.fetchall()]
+
+    return res
+
+async def upload_video(filename):
+    filepath = f'{DOWNLOAD_FOLDER}/{filename}'
+    # Ensure the video file exists
+    if not Path(filepath).exists():
+        print(f"File not found: {filepath}")
+        return
+    
+    async with TelegramClient('session_name', api_id, api_hash) as client:
+        print(f"Uploading video: {filepath}")
+        # Send the video to the private channel
+        message = await client.send_file(
+            entity=channel_id_destination,
+            file=filepath,
+            caption=filename
+        )
+        print(f"Video uploaded successfully. Message ID: {message.id}")
 
 def get_current_timestamp():
     from datetime import datetime
     current_datetime = datetime.now()
-    datetime_string = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
-    return str(datetime_string)
+    datetime_str = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
+    return str(datetime_str)
 
 def put_download_entry_in_db(message_id: int, new_filename: str, message: str):
     cursor = conn.cursor()
-    cursor.execute('''
-    INSERT INTO messages("id","new_filename","download_status","upload_status","content","download_timestamp","upload_timestamp") 
-                   VALUES (?,?,?,?,?,?,?);
-    ''', (int(message_id),new_filename,'downloading','not started', str(message),str(get_current_timestamp),''))
-    conn.commit()
+    try:
+        cursor.execute('''
+        INSERT INTO messages("id","new_filename","download_status","upload_status","content","download_timestamp","upload_timestamp") 
+                    VALUES (?,?,?,?,?,?,?);
+        ''', (int(message_id),new_filename,'downloading','not started', str(message),'',''))
+        conn.commit()
+    except sqlite3.IntegrityError as ex:
+        logging.exception(ex)
+        return False
+    return True
 
 if __name__ == "__main__":
-    init_db()
-    asyncio.run(download_videos())
+    # init_db()
+    # asyncio.run(download_videos())
+    get_pending_videos_to_upload()
