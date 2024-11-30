@@ -86,7 +86,8 @@ async def upload_video(filename):
         message = await client.send_file(
             entity=channel_id_destination,
             file=filepath,
-            caption=filename
+            caption=filename,
+            supports_streaming=True
         )
         print(f"Video uploaded successfully. Message ID: {message.id}")
 
@@ -112,4 +113,5 @@ def put_download_entry_in_db(message_id: int, new_filename: str, message: str):
 if __name__ == "__main__":
     # init_db()
     # asyncio.run(download_videos())
-    get_pending_videos_to_upload()
+    # get_pending_videos_to_upload()
+    asyncio.run(upload_video('92626.mp4'))
