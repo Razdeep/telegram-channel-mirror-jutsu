@@ -22,7 +22,7 @@ def generate_new_filename(message_text, message_id):
 
 async def download_videos():
     async with TelegramClient('session_name', api_id, api_hash) as client:
-        async for message in client.iter_messages(channel_id_source, limit=100, reverse=True):
+        async for message in client.iter_messages(channel_id_source, limit=1000, reverse=False):
             if not message.video:
                 print(f'skipping message id {message.id}, because it is not video')
                 continue
