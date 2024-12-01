@@ -1,16 +1,30 @@
 import constants
 from telethon import TelegramClient
+from telethon.tl.types import DocumentAttributeVideo
 from config import api_id, api_hash, channel_id_destination
 from pathlib import Path
 from repository import conn
 import logging
+from moviepy.editor import VideoFileClip
 
+def compute_video_details(filepath: str):
+    clip = VideoFileClip(filepath)
+    duration = int(clip.duration)  # Duration in seconds
+    width, height = clip.size      # Aspect ratio
+    clip.close()
+    return [duration, width, height]
 
 async def upload_video(filename):
     filepath = f'{constants.DOWNLOAD_FOLDER}/{filename}'
     # Ensure the video file exists
     if not Path(filepath).exists():
         logging.info(f"File not found: {filepath}")
+        return False
+    
+    duration, width, height = compute_video_details(filepath)
+
+    if duration * width * height == 0:
+        logging.error(f'duration or width or height is 0, please check {filename}')
         return False
     
     async with TelegramClient('session_name', api_id, api_hash) as client:
@@ -20,7 +34,15 @@ async def upload_video(filename):
             entity=channel_id_destination,
             file=filepath,
             caption=filename,
-            supports_streaming=True
+            supports_streaming=True,
+            attributes=[
+                DocumentAttributeVideo(
+                    duration=duration,
+                    w=width,
+                    h=height,
+                    supports_streaming=True  # Allows streaming in Telegram
+                )
+            ]
         )
         logging.info(f"Video uploaded successfully. Message ID: {message.id}")
 

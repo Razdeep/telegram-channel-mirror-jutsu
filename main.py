@@ -12,7 +12,7 @@ args = parser.parse_args()
 if __name__ == "__main__":
     repository.init_db()
     if args.upload:
-        asyncio.run(upload_service.upload_videos())
+        asyncio.run(upload_service.upload_videos(cleanup=False))
     else:
         asyncio.run(download_service.download_videos())
     
