@@ -9,7 +9,7 @@ import constants
 import sys
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     format="[%(asctime)s]: %(message)s",
     datefmt="%d/%b/%Y %H:%M:%S",
     stream=sys.stdout)
