@@ -1,1 +1,1 @@
-DOWNLOAD_FOLDER = 'downloads'
+DOWNLOAD_FOLDER = "downloads"

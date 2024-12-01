@@ -2,6 +2,7 @@ import sqlite3
 
 conn = sqlite3.connect("messages.db")
 
+
 # Initialize SQLite Database
 def init_db():
     cursor = conn.cursor()
