@@ -3,17 +3,18 @@ from telethon import TelegramClient
 from config import api_id, api_hash, channel_id_destination
 from pathlib import Path
 from repository import conn
+import logging
 
 
 async def upload_video(filename):
     filepath = f'{constants.DOWNLOAD_FOLDER}/{filename}'
     # Ensure the video file exists
     if not Path(filepath).exists():
-        print(f"File not found: {filepath}")
+        logging.info(f"File not found: {filepath}")
         return False
     
     async with TelegramClient('session_name', api_id, api_hash) as client:
-        print(f"Uploading video: {filepath}")
+        logging.info(f"Uploading video: {filepath}")
         # Send the video to the private channel
         message = await client.send_file(
             entity=channel_id_destination,
@@ -21,7 +22,7 @@ async def upload_video(filename):
             caption=filename,
             supports_streaming=True
         )
-        print(f"Video uploaded successfully. Message ID: {message.id}")
+        logging.info(f"Video uploaded successfully. Message ID: {message.id}")
 
     return True
 

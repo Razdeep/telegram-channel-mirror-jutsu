@@ -6,7 +6,13 @@ from pathlib import Path
 import logging
 from repository import conn
 import constants
+import sys
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="[%(asctime)s]: %(message)s",
+    datefmt="%d/%b/%Y %H:%M:%S",
+    stream=sys.stdout)
 
 def check_filename_already_exists_in_local(filename):
     return Path(filename).exists()
@@ -24,7 +30,7 @@ async def download_videos():
     async with TelegramClient('session_name', api_id, api_hash) as client:
         async for message in client.iter_messages(channel_id_source, limit=1000, reverse=False):
             if not message.video:
-                print(f'skipping message id {message.id}, because it is not video')
+                logging.info(f'skipping message id {message.id}, because it is not video')
                 continue
             
             new_filename = generate_new_filename(message.message, message.id)
@@ -32,12 +38,12 @@ async def download_videos():
             should_download = check_should_download(int(message.id))
 
             if not should_download:
-                print(f'skipping message id {message.id}, because {new_filename} was already downloaded before')
+                logging.info(f'skipping message id {message.id}, because {new_filename} was already downloaded before')
                 continue
             
             put_download_entry_in_db(int(message.id), new_filename, str(message.message))
             
-            print(f"Downloading video Message ID: {message.id}, filename: {new_filename}, video size: {message.video.size // (1024*1024)} MB approx")
+            logging.info(f"Downloading video Message ID: {message.id}, filename: {new_filename}, video size: {message.video.size // (1024*1024)} MB approx")
 
             video = await client.download_media(message.video, file=bytes)
             
