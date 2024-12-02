@@ -88,7 +88,7 @@ async def upload_video(filename: str):
 async def run_upload_workflow(message_id, filename, cleanup):
     upload_successful = await upload_video(filename)
     if upload_successful:
-        update_upload_status(message_id, "uploaded")
+        update_upload_status(message_id, constants.UploadStatus.UPLOADED)
     if cleanup:
         utils.delete_video_and_thumbnail(filename)
 
@@ -114,9 +114,9 @@ def update_upload_status(message_id: str, status_text: str):
 def get_pending_videos_to_upload():
     cursor = conn.cursor()
 
-    cursor.execute("""
+    cursor.execute(f"""
     SELECT message_id, new_filename from messages
-                   where not upload_status = "uploaded"
+                   where not upload_status = "{constants.UploadStatus.UPLOADED}"
     """)
 
     res = [item for item in cursor.fetchall()]

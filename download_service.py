@@ -8,7 +8,6 @@ from repository import conn
 import constants
 import sys
 import upload_service
-import deadpool
 import asyncio
 
 logging.basicConfig(
@@ -67,7 +66,7 @@ async def download_videos(also_upload=False):
             with open(f"{constants.DOWNLOAD_FOLDER}/{new_filename}", "wb") as fp:
                 fp.write(video)
 
-            update_download_status(message.id, "downloaded")
+            update_download_status(message.id, constants.DownloadStatus.DOWNLOADED)
 
             if also_upload:
                 cleanup = False
@@ -119,7 +118,7 @@ def check_should_download(message_id: int):
         res = [item for item in cursor.fetchall()]
         if len(res) == 0:
             return True
-        if res[0][1] == "downloaded":
+        if res[0][1] == constants.DownloadStatus.DOWNLOADED:
             return False
     except Exception as ex:
         logging.exception(ex)
@@ -137,8 +136,8 @@ def put_download_entry_in_db(message_id: int, new_filename: str, message: str):
             (
                 int(message_id),
                 new_filename,
-                "downloading",
-                "not started",
+                constants.DownloadStatus.NOT_DOWNLOADED,
+                constants.UploadStatus.NOT_UPLOADED,
                 str(message),
                 "",
                 "",
