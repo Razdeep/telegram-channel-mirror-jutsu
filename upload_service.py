@@ -1,4 +1,5 @@
 import constants
+import utils
 from telethon import TelegramClient
 from telethon.tl.types import DocumentAttributeVideo
 from config import api_id, api_hash, channel_id_destination
@@ -16,8 +17,35 @@ def compute_video_details(filepath: str):
     return [duration, width, height]
 
 
-async def upload_video(filename):
-    filepath = f"{constants.DOWNLOAD_FOLDER}/{filename}"
+def extract_thumbnail(video_filename: str):
+    """
+    Extracts a thumbnail from a video at a specific time.
+
+    Args:
+        video_filename (str): File name of video file.
+    """
+    try:
+        video_filepath = utils.get_absolute_downloads_path(video_filename)
+        clip = VideoFileClip(video_filepath)
+
+        frame = clip.get_frame(10.0)
+
+        # Save the frame as an image
+        from PIL import Image
+
+        img = Image.fromarray(frame)
+        thumbnail_name = utils.get_thumbnail_name_from_video_filename(video_filename)
+        thumbnail_path = f"{constants.DOWNLOAD_FOLDER}/{thumbnail_name}"
+        img.save(thumbnail_path)
+
+        print(f"Thumbnail saved at: {thumbnail_path}")
+        clip.close()
+    except Exception as e:
+        print(f"Error extracting thumbnail: {e}")
+
+
+async def upload_video(filename: str):
+    filepath = utils.get_absolute_downloads_path(filename)
     # Ensure the video file exists
     if not Path(filepath).exists():
         logging.info(f"File not found: {filepath}")
@@ -29,6 +57,11 @@ async def upload_video(filename):
         logging.error(f"duration or width or height is 0, please check {filename}")
         return False
 
+    extract_thumbnail(filename)
+    thumbnail_path = utils.get_absolute_downloads_path(
+        utils.get_thumbnail_name_from_video_filename(filename)
+    )
+
     async with TelegramClient("session_name", api_id, api_hash) as client:
         logging.info(f"Uploading video: {filepath}")
         # Send the video to the private channel
@@ -37,6 +70,7 @@ async def upload_video(filename):
             file=filepath,
             caption=filename,
             supports_streaming=True,
+            thumb=thumbnail_path,
             attributes=[
                 DocumentAttributeVideo(
                     duration=duration,
@@ -90,3 +124,7 @@ def get_pending_videos_to_upload():
     res = [item for item in cursor.fetchall()]
 
     return res
+
+
+if __name__ == "__main__":
+    extract_thumbnail("Belly.mp4")
