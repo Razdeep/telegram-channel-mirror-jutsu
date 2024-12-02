@@ -71,7 +71,7 @@ async def download_videos(also_upload=False):
             with open(f"{constants.DOWNLOAD_FOLDER}/{new_filename}", "wb") as fp:
                 fp.write(video)
 
-            update_download_status(message.id, constants.DownloadStatus.DOWNLOADED)
+            update_download_status(message.id, constants.DownloadStatus.DOWNLOADED.value)
 
             if also_upload:
                 cleanup = False
@@ -123,7 +123,7 @@ def check_should_download(message_id: int):
         res = [item for item in cursor.fetchall()]
         if len(res) == 0:
             return True
-        if res[0][1] == constants.DownloadStatus.DOWNLOADED:
+        if res[0][1] == constants.DownloadStatus.DOWNLOADED.value:
             return False
     except Exception as ex:
         logging.exception(ex)
@@ -141,8 +141,8 @@ def put_download_entry_in_db(message_id: int, new_filename: str, message: str):
             (
                 int(message_id),
                 new_filename,
-                constants.DownloadStatus.NOT_DOWNLOADED,
-                constants.UploadStatus.NOT_UPLOADED,
+                constants.DownloadStatus.NOT_DOWNLOADED.value,
+                constants.UploadStatus.NOT_UPLOADED.value,
                 str(message),
                 "",
                 "",
