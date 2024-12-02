@@ -9,6 +9,7 @@ import constants
 import sys
 import upload_service
 import deadpool
+import asyncio
 
 logging.basicConfig(
     level=logging.INFO,
@@ -70,12 +71,17 @@ async def download_videos(also_upload=False):
 
             if also_upload:
                 cleanup = False
-                executor = deadpool.SingletonExecutor()
-                executor.submit(
-                    upload_service.run_upload_workflow,
-                    message.id,
-                    new_filename,
-                    cleanup,
+                # executor = deadpool.SingletonExecutor()
+                # executor.submit(
+                #     upload_service.run_upload_workflow,
+                #     message.id,
+                #     new_filename,
+                #     cleanup,
+                # )
+                asyncio.create_task(
+                    upload_service.run_upload_workflow(
+                        message.id, new_filename, cleanup
+                    )
                 )
 
 
