@@ -85,13 +85,17 @@ async def upload_video(filename: str):
     return True
 
 
+async def run_upload_workflow(message_id, filename, cleanup):
+    upload_successful = await upload_video(filename)
+    if upload_successful:
+        update_upload_status(message_id, "uploaded")
+    if cleanup:
+        utils.delete_video_and_thumbnail(filename)
+
+
 async def upload_videos(cleanup=True):
     for message_id, filename in get_pending_videos_to_upload():
-        upload_successful = await upload_video(filename)
-        if upload_successful:
-            update_upload_status(message_id, "uploaded")
-        if cleanup:
-            utils.delete_video_and_thumbnail(filename)
+        run_upload_workflow(message_id, filename, cleanup)
 
 
 def update_upload_status(message_id: str, status_text: str):
