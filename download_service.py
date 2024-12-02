@@ -27,7 +27,7 @@ def generate_new_filename(message_text, message_id):
     if message_text == "":
         return f"{message_id}.mp4"
     new_filename = re.sub("[^a-zA-Z ]+", "", message_text)[:30].strip()
-    if check_filename_already_exists_in_local(new_filename):
+    if check_filename_already_exists_in_local(f'{new_filename}.mp4'):
         new_filename = f"{new_filename}_{message_id}"
     new_filename = f"{new_filename}.mp4"
     return new_filename
