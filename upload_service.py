@@ -91,13 +91,7 @@ async def upload_videos(cleanup=True):
         if upload_successful:
             update_upload_status(message_id, "uploaded")
         if cleanup:
-            delete_video(filename)
-
-
-def delete_video(filename: str):
-    file_path = Path(f"{constants.DOWNLOAD_FOLDER}/{filename}")
-    if file_path.exists():
-        file_path.unlink()
+            utils.delete_video_and_thumbnail(filename)
 
 
 def update_upload_status(message_id: str, status_text: str):
