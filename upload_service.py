@@ -83,7 +83,7 @@ async def upload_video(filename: str):
             )
             logging.info(f"{filename} uploaded successfully. Message ID: {message.id}")
         except Exception as ex:
-            logging.error(f'could not uploaded {filename}')
+            logging.error(f"could not uploaded {filename}")
             logging.exception(ex)
             return False
 

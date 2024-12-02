@@ -27,7 +27,7 @@ def generate_new_filename(message_text, message_id):
     if message_text == "":
         return f"{message_id}.mp4"
     new_filename = re.sub("[^a-zA-Z ]+", "", message_text)[:30].strip()
-    if check_filename_already_exists_in_local(f'{new_filename}.mp4'):
+    if check_filename_already_exists_in_local(f"{new_filename}.mp4"):
         new_filename = f"{new_filename}_{message_id}"
     new_filename = f"{new_filename}.mp4"
     return new_filename
@@ -65,14 +65,16 @@ async def download_videos(also_upload=False):
             try:
                 video = await client.download_media(message.video, file=bytes)
             except Exception as ex:
-                logging.error(f'error downloading {new_filename}')
+                logging.error(f"error downloading {new_filename}")
                 logging.exception(ex)
                 continue
 
             with open(f"{constants.DOWNLOAD_FOLDER}/{new_filename}", "wb") as fp:
                 fp.write(video)
 
-            update_download_status(message.id, constants.DownloadStatus.DOWNLOADED.value)
+            update_download_status(
+                message.id, constants.DownloadStatus.DOWNLOADED.value
+            )
 
             if also_upload:
                 cleanup = False
@@ -83,11 +85,14 @@ async def download_videos(also_upload=False):
                 #     new_filename,
                 #     cleanup,
                 # )
-                asyncio.create_task(
-                    upload_service.run_upload_workflow(
-                        message.id, new_filename, cleanup
-                    )
-                )
+
+                # asyncio.create_task(
+                #     upload_service.run_upload_workflow(
+                #         message.id, new_filename, cleanup
+                #     )
+                # )
+
+                upload_service.run_upload_workflow(message.id, new_filename, cleanup)
 
 
 def update_download_status(message_id: str, status_text: str):
