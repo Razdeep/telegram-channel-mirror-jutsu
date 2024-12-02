@@ -7,6 +7,8 @@ import logging
 from repository import conn
 import constants
 import sys
+import upload_service
+import deadpool
 
 logging.basicConfig(
     level=logging.INFO,
@@ -30,7 +32,7 @@ def generate_new_filename(message_text, message_id):
     return new_filename
 
 
-async def download_videos():
+async def download_videos(also_upload=False):
     async with TelegramClient("session_name", api_id, api_hash) as client:
         async for message in client.iter_messages(
             channel_id_source, limit=1000, reverse=False
@@ -65,6 +67,16 @@ async def download_videos():
                 fp.write(video)
 
             update_download_status(message.id, "downloaded")
+
+            if also_upload:
+                cleanup = False
+                executor = deadpool.SingletonExecutor()
+                executor.submit(
+                    upload_service.run_upload_workflow,
+                    message.id,
+                    new_filename,
+                    cleanup,
+                )
 
 
 def update_download_status(message_id: str, status_text: str):
