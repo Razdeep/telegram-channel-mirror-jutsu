@@ -62,7 +62,7 @@ async def upload_video(filename: str):
         utils.get_thumbnail_name_from_video_filename(filename)
     )
 
-    async with TelegramClient("session_name", api_id, api_hash) as client:
+    async with TelegramClient("upload_session", api_id, api_hash) as client:
         logging.info(f"Uploading video: {filepath}")
         # Send the video to the private channel
         message = await client.send_file(

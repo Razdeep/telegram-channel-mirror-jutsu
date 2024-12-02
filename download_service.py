@@ -34,7 +34,7 @@ def generate_new_filename(message_text, message_id):
 
 
 async def download_videos(also_upload=False):
-    async with TelegramClient("session_name", api_id, api_hash) as client:
+    async with TelegramClient("download_session", api_id, api_hash) as client:
         async for message in client.iter_messages(
             channel_id_source, limit=1000, reverse=False
         ):
@@ -96,6 +96,7 @@ def update_download_status(message_id: str, status_text: str):
     )
 
     conn.commit()
+    cursor.close()
 
 
 def get_current_timestamp():
