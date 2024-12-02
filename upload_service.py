@@ -63,24 +63,29 @@ async def upload_video(filename: str):
     )
 
     async with TelegramClient("upload_session", api_id, api_hash) as client:
-        logging.info(f"Uploading video: {filepath}")
-        # Send the video to the private channel
-        message = await client.send_file(
-            entity=channel_id_destination,
-            file=filepath,
-            caption=filename,
-            supports_streaming=True,
-            thumb=thumbnail_path,
-            attributes=[
-                DocumentAttributeVideo(
-                    duration=duration,
-                    w=width,
-                    h=height,
-                    supports_streaming=True,  # Allows streaming in Telegram
-                )
-            ],
-        )
-        logging.info(f"Video uploaded successfully. Message ID: {message.id}")
+        try:
+            logging.info(f"Uploading video: {filepath}")
+            # Send the video to the private channel
+            message = await client.send_file(
+                entity=channel_id_destination,
+                file=filepath,
+                caption=filename,
+                supports_streaming=True,
+                thumb=thumbnail_path,
+                attributes=[
+                    DocumentAttributeVideo(
+                        duration=duration,
+                        w=width,
+                        h=height,
+                        supports_streaming=True,  # Allows streaming in Telegram
+                    )
+                ],
+            )
+            logging.info(f"{filename} uploaded successfully. Message ID: {message.id}")
+        except Exception as ex:
+            logging.error(f'could not uploaded {filename}')
+            logging.exception(ex)
+            return False
 
     return True
 

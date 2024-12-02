@@ -1,6 +1,7 @@
 config.py
 .venv
 *.session
+*.session-journal
 downloads
 __pycache__
 *.mp4

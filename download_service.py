@@ -61,7 +61,12 @@ async def download_videos(also_upload=False):
                 f"Downloading video Message ID: {message.id}, filename: {new_filename}, video size: {message.video.size // (1024*1024)} MB approx"
             )
 
-            video = await client.download_media(message.video, file=bytes)
+            try:
+                video = await client.download_media(message.video, file=bytes)
+            except Exception as ex:
+                logging.error(f'error downloading {new_filename}')
+                logging.exception(ex)
+                continue
 
             with open(f"{constants.DOWNLOAD_FOLDER}/{new_filename}", "wb") as fp:
                 fp.write(video)
