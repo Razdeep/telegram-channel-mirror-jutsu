@@ -96,6 +96,7 @@ async def run_upload_workflow(message_id, filename, cleanup):
         logging.error(
             f"upload was not successful for {filename}, message_id: {message_id}"
         )
+        return
     update_upload_status(message_id, constants.UploadStatus.UPLOADED.value)
     if cleanup:
         utils.delete_video_and_thumbnail(filename)
