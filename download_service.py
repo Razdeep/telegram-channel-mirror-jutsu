@@ -8,6 +8,7 @@ from repository import conn
 import constants
 import sys
 import upload_service
+
 # import asyncio
 import utils
 
@@ -92,7 +93,9 @@ async def download_videos(also_upload=False):
                 #     )
                 # )
 
-                await upload_service.run_upload_workflow(message.id, new_filename, cleanup)
+                await upload_service.run_upload_workflow(
+                    message.id, new_filename, cleanup
+                )
 
 
 def update_download_status(message_id: str, status_text: str):

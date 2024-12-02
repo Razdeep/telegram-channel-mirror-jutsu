@@ -92,15 +92,18 @@ async def upload_video(filename: str):
 
 async def run_upload_workflow(message_id, filename, cleanup):
     upload_successful = await upload_video(filename)
-    if upload_successful:
-        update_upload_status(message_id, constants.UploadStatus.UPLOADED.value)
+    if not upload_successful:
+        logging.error(
+            f"upload was not successful for {filename}, message_id: {message_id}"
+        )
+    update_upload_status(message_id, constants.UploadStatus.UPLOADED.value)
     if cleanup:
         utils.delete_video_and_thumbnail(filename)
 
 
 async def upload_videos(cleanup=True):
     for message_id, filename in get_pending_videos_to_upload():
-        run_upload_workflow(message_id, filename, cleanup)
+        await run_upload_workflow(message_id, filename, cleanup)
 
 
 def update_upload_status(message_id: str, status_text: str):
