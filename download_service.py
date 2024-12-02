@@ -9,6 +9,7 @@ import constants
 import sys
 import upload_service
 import asyncio
+import utils
 
 logging.basicConfig(
     level=logging.INFO,
@@ -19,7 +20,7 @@ logging.basicConfig(
 
 
 def check_filename_already_exists_in_local(filename):
-    return Path(filename).exists()
+    return Path(utils.get_absolute_downloads_path(filename)).exists()
 
 
 def generate_new_filename(message_text, message_id):
