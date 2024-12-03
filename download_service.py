@@ -78,7 +78,7 @@ async def download_videos(also_upload=False):
             )
 
             if also_upload:
-                cleanup = False
+                cleanup = True
                 # executor = deadpool.SingletonExecutor()
                 # executor.submit(
                 #     upload_service.run_upload_workflow,
