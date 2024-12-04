@@ -5,7 +5,7 @@ import repository
 import argparse
 
 parser = argparse.ArgumentParser(
-    description="Kakashi, the telegram channnel copy jutsu"
+    description="Kakashi, the telegram channel copy ninja"
 )
 
 parser.add_argument(
