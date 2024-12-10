@@ -40,8 +40,8 @@ def extract_thumbnail(video_filename: str):
 
         print(f"Thumbnail saved at: {thumbnail_path}")
         clip.close()
-    except Exception as e:
-        print(f"Error extracting thumbnail: {e}")
+    except Exception as ex:
+        logging.exception(ex)
 
 
 async def upload_video(filename: str):
@@ -50,8 +50,11 @@ async def upload_video(filename: str):
     if not Path(filepath).exists():
         logging.info(f"File not found: {filepath}")
         return False
-
-    duration, width, height = compute_video_details(filepath)
+    
+    try:
+        duration, width, height = compute_video_details(filepath)
+    except Exception as ex:
+        logging.exception(ex)
 
     if duration * width * height == 0:
         logging.error(f"duration or width or height is 0, please check {filename}")
