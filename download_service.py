@@ -39,7 +39,7 @@ def generate_new_filename(message_text, message_id):
 async def download_videos(also_upload=False):
     async with TelegramClient("download_session", api_id, api_hash) as client:
         async for message in client.iter_messages(
-            channel_id_source, limit=1000, reverse=False
+            channel_id_source, limit=1000, reverse=True
         ):
             if not message.video:
                 logging.info(
