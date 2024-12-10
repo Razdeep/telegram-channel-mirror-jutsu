@@ -51,6 +51,7 @@ async def upload_video(filename: str):
         logging.info(f"File not found: {filepath}")
         return False
     
+    duration, width, height = 0, 0, 0
     try:
         duration, width, height = compute_video_details(filepath)
     except Exception as ex:
