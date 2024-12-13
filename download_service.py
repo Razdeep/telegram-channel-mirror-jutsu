@@ -6,19 +6,10 @@ from pathlib import Path
 import logging
 from repository import conn
 import constants
-import sys
 import upload_service
 
 # import asyncio
 import utils
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="[%(asctime)s]: %(message)s",
-    datefmt="%d/%b/%Y %H:%M:%S",
-    stream=sys.stdout,
-)
-
 
 def check_filename_already_exists_in_local(filename):
     return Path(utils.get_absolute_downloads_path(filename)).exists()
@@ -27,7 +18,7 @@ def check_filename_already_exists_in_local(filename):
 def generate_new_filename(message_text, message_id):
     if message_text == "":
         return f"{message_id}.mp4"
-    new_filename = re.sub("[^a-zA-Z ]+", "", message_text)[:30].strip()
+    new_filename = re.sub(constants.FILENAME_REGEX_PATTERN, "", message_text)[:30].strip()
     if new_filename == "":
         return f"{message_id}.mp4"
     if check_filename_already_exists_in_local(f"{new_filename}.mp4"):

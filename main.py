@@ -3,10 +3,17 @@ import download_service
 import upload_service
 import repository
 import argparse
+import logging
+import sys
 
-parser = argparse.ArgumentParser(
-    description="Kakashi tele-cloner"
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(asctime)s]: %(message)s",
+    datefmt="%d/%b/%Y %H:%M:%S",
+    stream=sys.stdout,
 )
+
+parser = argparse.ArgumentParser(description="Telegram Channel Mirror Jutsu")
 
 parser.add_argument(
     "--upload-only", action="store_true", help="Flag to trigger only upload process."
