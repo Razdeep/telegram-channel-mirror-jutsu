@@ -2,7 +2,7 @@ from enum import Enum
 
 DOWNLOAD_FOLDER = "downloads"
 
-FILENAME_REGEX_PATTERN = "^[a-zA-Z0-9\-\.\(\) ]+$"
+FILENAME_EXCLUDED_CHAR_REGEX =  r'[^a-zA-Z0-9\-\.\(\) ]'
 
 
 class DownloadStatus(Enum):
