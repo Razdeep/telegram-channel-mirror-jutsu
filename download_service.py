@@ -18,7 +18,7 @@ def check_filename_already_exists_in_local(filename):
 def generate_new_filename(message_text, message_id):
     if message_text == "":
         return f"{message_id}.mp4"
-    new_filename = re.sub(constants.FILENAME_EXCLUDED_CHAR_REGEX, "", message_text)[:30].strip()
+    new_filename = re.sub(constants.FILENAME_EXCLUDED_CHAR_REGEX, "", message_text)[:constants.FILENAME_CHAR_LIMIT].strip()
     if new_filename == "":
         return f"{message_id}.mp4"
     if check_filename_already_exists_in_local(f"{new_filename}.mp4"):
