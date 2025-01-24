@@ -13,6 +13,7 @@ api_hash = config.api_hash
 async def forward_existing_messages():
     try:
         async with TelegramClient("download_session", api_id, api_hash) as client:
+            '''
             async for message in client.iter_messages(
                 config.forward_channel_id_source, limit=4000, reverse=True
             ):
@@ -26,6 +27,10 @@ async def forward_existing_messages():
                 )
                 logging.info(f"Message forwarded: {message.text}")
                 time.sleep(0.5)
+            '''
+            async for message in client.iter_messages(config.forward_channel_id_source):
+                await client.forward_messages(entity=config.forward_channel_id_destination, messages=message.id, from_peer=config.forward_channel_id_source)
+                logging.info("Message forwarded successfully!")
     except Exception as e:
         logging.exception(f"Failed to forward messages: {e}")
 
