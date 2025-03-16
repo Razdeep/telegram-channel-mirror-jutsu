@@ -30,7 +30,7 @@ async def forward_existing_messages():
             '''
             async for message in client.iter_messages(config.forward_channel_id_source):
                 await client.forward_messages(entity=config.forward_channel_id_destination, messages=message.id, from_peer=config.forward_channel_id_source)
-                logging.info("Message forwarded successfully!")
+                logging.info("{message.id} message forwarded successfully!")
     except Exception as e:
         logging.exception(f"Failed to forward messages: {e}")
 

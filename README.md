@@ -12,3 +12,9 @@
 ```sh
 git clone https://github.com/Razdeep/kakashi-tele-cloner.git
 ```
+
+## How to find channel id
+
+1. Use the [IDBot](https://t.me/username_to_id_bot) telegram bot to find the channel id of the source and the destination channels.
+
+2. Put the channel id values in the `config.py` placeholders.
